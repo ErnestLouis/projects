@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <ctime>
 
 void play_game();
 bool want_to_play_again();
@@ -16,6 +17,8 @@ const int IGNORE_CHAR = 256;
 
 int main()
 {
+	std::srand(std::time(0));//seed
+
 	do
 	{
 		play_game();
@@ -29,11 +32,11 @@ int main()
 void play_game()
 {
 	const int UPPER_BOUND = 100;
-	int secret_number = 65;
+	int secret_number = std::rand() % 100 + 1;
 	int number_of_tries_left = ceil(log2(UPPER_BOUND));
 	int guess = 0;
 
-	std::cout << " The range of the number is between 0 and 100" << std::endl;
+	std::cout << " The range of the number is between 0 and 100" << std:: endl;
 	do
 	{
 
@@ -53,7 +56,7 @@ void play_game()
 			}
 		}
 
-	} while (!is_game_over(secret_number, number_of_tries_left, guess));
+	} while (!is_game_over(secret_number,number_of_tries_left,guess));
 
 	display_result(secret_number, number_of_tries_left);
 
@@ -61,7 +64,7 @@ void play_game()
 
 bool want_to_play_again()
 {
-
+	
 	char input;
 	bool failure;
 
@@ -81,7 +84,7 @@ bool want_to_play_again()
 		}
 	} while (failure);
 
-	return input == 'y' || 'Y';
+	return input == 'y';
 }
 
 bool is_game_over(int secret_number, int number_of_tries_left, int guess)
@@ -118,7 +121,7 @@ void display_result(int secret_number, int number_of_tries_left)
 {
 	if (number_of_tries_left > 0)
 	{
-		std::cout << "You got it! It was: " << secret_number << std::endl;
+		std::cout<< "You got it! It was: " << secret_number << std::endl;
 	}
 	else
 	{
