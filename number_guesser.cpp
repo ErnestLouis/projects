@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <cctype>
 
 void play_game();
 bool want_to_play_again();
@@ -81,6 +82,12 @@ bool want_to_play_again()
 			std::cin.ignore(IGNORE_CHAR, '\n');
 			std::cout << "Input error! Please try agin." << std::endl;
 			failure = true;
+		}
+		else
+		{
+			std::cin.ignore(IGNORE_CHAR, '\n');
+
+			input = tolower(input);
 		}
 	} while (failure);
 
