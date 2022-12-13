@@ -33,7 +33,7 @@ int main()
 void play_game()
 {
 	const int UPPER_BOUND = 100;
-	int secret_number = std::rand() % 100 + 1;
+	int secret_number = std::rand() % UPPER_BOUND + 1;
 	int number_of_tries_left = ceil(log2(UPPER_BOUND));
 	int guess = 0;
 
