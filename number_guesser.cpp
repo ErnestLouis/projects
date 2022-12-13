@@ -6,9 +6,13 @@
 
 void play_game();
 bool want_to_play_again();
-bool is_game_over(int secret_number, int number_of_tries, int guess);
-int get_guess(int number_of_tries);
-void display_result(secret_number, number_of_tries);
+bool is_game_over(int secret_number, int number_of_tries_left, int guess);
+int get_guess(int number_of_tries_left);
+void display_result(int secret_number, int number_of_tries_left);
+
+
+const int IGNORE_CHAR = 256;
+
 
 int main()
 {
@@ -26,16 +30,17 @@ void play_game()
 {
 	const int UPPER_BOUND = 100;
 	int secret_number = 65;
-	int number_of_tries = ceil(log2(UPPER_BOUND));
+	int number_of_tries_left = ceil(log2(UPPER_BOUND));
 	int guess = 0;
 
+	std::cout << " The range of the number is between 0 and 100" << std::endl;
 	do
 	{
 
-		guess = get_guess(number_of_tries);
+		guess = get_guess(number_of_tries_left);
 		if (guess != secret_number)
 		{
-			number_of_tries--;
+			number_of_tries_left--;
 			if (guess > secret_number)
 			{
 				std::cout << "Your guess was too high!" << std::endl;
@@ -48,26 +53,45 @@ void play_game()
 			}
 		}
 
-	} while (!is_game_over(secret_number, number_of_tries, guess));
+	} while (!is_game_over(secret_number, number_of_tries_left, guess));
+
+	display_result(secret_number, number_of_tries_left);
 
 }
 
 bool want_to_play_again()
 {
 
-	//TODO: implement
+	char input;
+	bool failure;
 
-	return false;
+	do
+	{
+		failure = false;
+
+		std::cout << "Would you like to play again? (y/n)";
+		std::cin >> input;
+
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(IGNORE_CHAR, '\n');
+			std::cout << "Input error! Please try agin." << std::endl;
+			failure = true;
+		}
+	} while (failure);
+
+	return input == 'y' || 'Y';
 }
 
-bool is_game_over(int secret_number, int number_of_tries, int guess)
+bool is_game_over(int secret_number, int number_of_tries_left, int guess)
 {
-	return secret_number == guess || number_of_tries <= 0;
+	return secret_number == guess || number_of_tries_left <= 0;
 }
 
-int get_guess(int number_of_tries)
+int get_guess(int number_of_tries_left)
 {
-	const int IGNORE_CHAR = 256;
+
 	int guess;
 	bool failure;
 
@@ -75,7 +99,7 @@ int get_guess(int number_of_tries)
 	{
 		failure = false;
 
-		std::cout << "please enter you guess ( number of guesses left: " << number_of_tries << "): ";
+		std::cout << "please enter you guess ( number of guesses left: " << number_of_tries_left << "): ";
 		std::cin >> guess;
 
 		if (std::cin.fail())
@@ -90,7 +114,14 @@ int get_guess(int number_of_tries)
 	return guess;
 }
 
-void display_result(secret_number, number_of_tries)
+void display_result(int secret_number, int number_of_tries_left)
 {
-
+	if (number_of_tries_left > 0)
+	{
+		std::cout << "You got it! It was: " << secret_number << std::endl;
+	}
+	else
+	{
+		std::cout << "You didn't get it.... It was: " << secret_number << std::endl;
+	}
 }
