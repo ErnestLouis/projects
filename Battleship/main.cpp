@@ -96,6 +96,15 @@ void setup_board(Player& player);
 
 void clear_boards(Player& player);
 
+void draw_boards(const Player& player);
+
+void draw_seperator_line();
+
+void draw_columns_row();
+
+void draw_shipboard_row(const Player& player, int row);
+
+char get_guess_representation(const Player& player, int row, int col);
 
 int main() {
 
@@ -112,7 +121,7 @@ int main() {
 
 }
 
-void initialize_player(Player& player, std::string  player_name)
+void initialize_player(Player& player, std::string  player_name) 
 {
     if (std::size(player_name) > 0)
     {
@@ -142,7 +151,7 @@ bool want_to_play_again()
 
     const char valid_input[2] = { 'y', 'n' };
 
-    input = get_character(prompt, error, CC_LOWER_CASE);
+    input = get_character(prompt, error,CC_LOWER_CASE);
 
     return input == 'y';
 }
@@ -150,6 +159,8 @@ bool want_to_play_again()
 void setup_board(Player& player)
 {
     clear_boards(player);
+
+    draw_boards(player);
 }
 
 void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type)
@@ -161,7 +172,7 @@ void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type)
     ship.orientation = SO_HORIZONTAL;
 }
 
-void clear_boards(Player& player)
+void clear_boards(Player& player) 
 {
     for (int r = 0; r < BOARD_SIZE; r++)
     {
@@ -171,5 +182,136 @@ void clear_boards(Player& player)
             player.ship_board[r][c].ship_type = ST_NONE; // no ship present
             player.ship_board[r][c].is_hit = false;
         }
+    }
+}
+
+void draw_shipboard_row(const Player& player, int row)
+{
+    char row_name = row + 'A';
+    std::cout << row_name << "|";
+
+    for (int c = 0; c < BOARD_SIZE; c++)
+    {
+        std::cout << " " << " " << " |";
+    }
+}
+
+void draw_guessboard_row(const Player& player, int row)
+{
+    char row_name = row + 'A';
+    std::cout << row_name << "|";
+
+    for (int c = 0; c < BOARD_SIZE; c++)
+    {
+        std::cout << " " << get_guess_representation(player,row,c) << " |";
+    }
+}
+
+void draw_boards(const Player& player)
+{
+    draw_columns_row();
+
+    draw_columns_row();
+
+    std::cout << std::endl;
+
+    for (int r = 0; r < BOARD_SIZE; r++)
+    {
+        draw_seperator_line();
+
+        std::cout << " ";
+
+        draw_seperator_line();
+
+        std::cout << std::endl;
+
+        draw_shipboard_row(player, r);
+
+        std::cout << " ";
+
+        draw_shipboard_row(player, r);
+
+        std::cout << std::endl;
+    }
+
+    draw_seperator_line();
+
+    std::cout << " ";
+
+    draw_seperator_line();
+
+    std::cout << std::endl;
+
+}
+
+void draw_seperator_line()
+{
+    std::cout << " ";
+
+    for (int c = 0; c < BOARD_SIZE; c++)
+    {
+        std::cout << "+---";
+    }
+
+    std::cout << "+";
+}
+
+void draw_columns_row()
+{
+    std::cout << "  ";
+
+    for (int c = 0; c < BOARD_SIZE; c++)
+    {
+        int column_name = c + 1;
+
+        std::cout << " "<< column_name << "  ";
+    }
+}
+char get_ship_representation(const Player& player, int row, int col)
+{
+    if (player.ship_board[row][col].is_hit)
+    {
+        return '*'; // represent hit
+    }
+
+    if (player.ship_board[row][col].ship_type == ST_AIRCRAFT_CARRIER)
+    {
+        return 'A';
+    }
+    else if (player.ship_board[row][col].ship_type == ST_BATTLESHIP)
+    {
+        return 'B';
+    }
+    else if (player.ship_board[row][col].ship_type == ST_CRUISER)
+    {
+        return 'C';
+    }
+    else if (player.ship_board[row][col].ship_type == ST_DESTROYER)
+    {
+        return 'D';
+    }
+    else if (player.ship_board[row][col].ship_type == ST_SUBMARINE)
+    {
+        return 'S';
+    }
+    else
+    {
+        return ' ';
+    }
+}
+
+char get_guess_representation(const Player& player, int row, int col)
+{
+    if (player.guess_board[row][col] == GT_HIT)
+    {
+        return '*';
+    }
+    else if (player.guess_board[row][col] == GT_MISSED)
+    {
+        return 'o';
+    }
+    else
+    {
+        return ' ';
     }
 }
