@@ -5,6 +5,10 @@
 #include <string>
 #include "utils.h"
 
+//error string
+std::string prompt{ "Would you like to play again? (y/n)" };
+std::string error{ "invalid character entered, please try again! " };
+
 //constants-anonymous enum with a bunch of values
 enum
 {
@@ -20,7 +24,7 @@ enum
     MAX_SHIP_SIZE = AIRCRAFT_CARRIER_SIZE
 };
 
-enum ship_type
+enum Ship_type
 {
     ST_NONE = 0, //SHIP TYPE NONE
     ST_AIRCRAFT_CARRIER,
@@ -45,10 +49,10 @@ struct Ship_position_type
 
 struct Ship
 {
-    ship_type s_type;
-    int s_size;
-    ship_orientation s_orientation;
-    Ship_position_type s_position;
+    Ship_type ship_type;
+    int ship_size;
+    ship_orientation orientation;
+    Ship_position_type position;
 };
 
 //Boards
@@ -63,7 +67,7 @@ enum guess_type
 
 struct ship_part_type//because 1 squre on the board
 {
-    ship_type s_type;
+    Ship_type ship_type;
     bool is_hit;
 };
 
@@ -81,9 +85,17 @@ struct Player
 
 void initialize_player(Player& player, std::string  player_name);
 
+void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type);
+
+
 void play_game(Player& player1, Player& player2);
 
 bool want_to_play_again();
+
+void setup_board(Player& player);
+
+void clear_boards(Player& player);
+
 
 int main() {
 
@@ -100,7 +112,7 @@ int main() {
 
 }
 
-void initialize_player(Player& player, std::string  player_name) 
+void initialize_player(Player& player, std::string  player_name)
 {
     if (std::size(player_name) > 0)
     {
@@ -118,7 +130,11 @@ void initialize_player(Player& player, std::string  player_name)
     initialize_ship(player.ships[4], SUBMARINE_SIZE, ST_SUBMARINE);
 }
 
-void play_game(Player& player1, Player& player2);
+void play_game(Player& player1, Player& player2)
+{
+    setup_board(player1);
+    setup_board(player2);
+}
 
 bool want_to_play_again()
 {
@@ -126,5 +142,34 @@ bool want_to_play_again()
 
     const char valid_input[2] = { 'y', 'n' };
 
-    input = get_character("Would you like to play again? (y/n)");
+    input = get_character(prompt, error, CC_LOWER_CASE);
+
+    return input == 'y';
+}
+
+void setup_board(Player& player)
+{
+    clear_boards(player);
+}
+
+void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type)
+{
+    ship.ship_type = ship_type;
+    ship.ship_size = ship_size;
+    ship.position.row = 0;
+    ship.position.col = 0;
+    ship.orientation = SO_HORIZONTAL;
+}
+
+void clear_boards(Player& player)
+{
+    for (int r = 0; r < BOARD_SIZE; r++)
+    {
+        for (int c = 0; c < BOARD_SIZE; c++)
+        {
+            player.guess_board[r][c] = GT_NONE;
+            player.ship_board[r][c].ship_type = ST_NONE; // no ship present
+            player.ship_board[r][c].is_hit = false;
+        }
+    }
 }
