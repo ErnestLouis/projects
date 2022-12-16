@@ -2,8 +2,10 @@
 //
 
 #include <iostream>
+#include <string>
+#include "utils.h"
 
-//constants
+//constants-anonymous enum with a bunch of values
 enum
 {
     AIRCRAFT_CARRIER_SIZE = 5,
@@ -69,20 +71,60 @@ struct ship_part_type//because 1 squre on the board
 //------
 struct Player
 {
-    char player_name[PLAYER_NAME_SIZE];
-    Ship ship_num[NUM_SHIPS];
+    //char player_name[PLAYER_NAME_SIZE];
+    std::string player_name;
+    Ship ships[NUM_SHIPS];
     guess_type guess_board[BOARD_SIZE][BOARD_SIZE];
     ship_part_type ship_board[BOARD_SIZE][BOARD_SIZE];
 
 };
 
+void initialize_player(Player& player, std::string  player_name);
 
+void play_game(Player& player1, Player& player2);
+
+bool want_to_play_again();
 
 int main() {
 
+    Player player1;
+    Player player2;
 
+    initialize_player(player1, "Player1");
+    initialize_player(player1, "Player2");
 
+    do
+    {
+        play_game(player1, player2);
+    } while (want_to_play_again());
 
 }
 
+void initialize_player(Player& player, std::string  player_name) 
+{
+    if (std::size(player_name) > 0)
+    {
+        player.player_name = player_name;
+    }
 
+    initialize_ship(player.ships[0], AIRCRAFT_CARRIER_SIZE, ST_AIRCRAFT_CARRIER);
+
+    initialize_ship(player.ships[1], BATTLESHIP_SIZE, ST_BATTLESHIP);
+
+    initialize_ship(player.ships[2], CRUISER_SIZE, ST_CRUISER);
+
+    initialize_ship(player.ships[3], DESTROYER_SIZE, ST_DESTROYER);
+
+    initialize_ship(player.ships[4], SUBMARINE_SIZE, ST_SUBMARINE);
+}
+
+void play_game(Player& player1, Player& player2);
+
+bool want_to_play_again()
+{
+    char input;
+
+    const char valid_input[2] = { 'y', 'n' };
+
+    input = get_character("Would you like to play again? (y/n)");
+}
