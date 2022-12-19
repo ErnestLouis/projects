@@ -1,8 +1,6 @@
 #include "Utils.h"
-#include <iostream>
-#include <cctype>
 
-using namespace std;
+
 
 const std::string INPUT_ERROR_STRING = "Input error! Please try again.";
 
@@ -35,7 +33,10 @@ char get_character(const std::string prompt, const std::string error) {
 	return input;
 }
 
-char get_character(const std::string prompt, const std::string error, character_casetype char_case) {
+char get_character(const std::string prompt, const std::string error, const char validInput[], int validInputLength, character_casetype char_case) {
+
+	const int IGNORE_CHARS = 256;
+
 	char input{};
 	bool failure;
 
@@ -47,6 +48,7 @@ char get_character(const std::string prompt, const std::string error, character_
 
 		if (std::cin.fail()) {
 			std::cin.clear();
+			std::cin.ignore(IGNORE_CHARS, '\n');
 			std::cout << INPUT_ERROR_STRING << std::endl;
 			failure = true;
 		}
@@ -60,14 +62,25 @@ char get_character(const std::string prompt, const std::string error, character_
 			{
 				input = tolower(input);
 			}
+
+			for (int i = 0; i < validInputLength; i++)
+			{
+				if (input == validInput[i])
+				{
+					return input;
+				}
+			}
 		}
-		else {
+		else
+		{
 			std::cout << error << std::endl;
 			failure = true;
 		}
 
 	} while (failure);
-	std::cout << "You entered: " << input << std::endl;
+
+	std::cout << "You entered: " << input << std::endl;//block out line
+
 	return input;
 }
 
@@ -76,10 +89,13 @@ char get_character(const std::string prompt, const std::string error, character_
 
 int get_integer(const std::string prompt, const std::string error, const int valid_input[], int valid_inputlength)
 {
+
+	const int IGNORE_CHARS = 256;
+
 	int input;
 	bool input_failure;
 
-	
+
 	do
 	{
 
@@ -90,7 +106,8 @@ int get_integer(const std::string prompt, const std::string error, const int val
 
 		if (std::cin.fail()) {
 			std::cin.clear();
-			std::cout << INPUT_ERROR_STRING << std::endl;
+			std::cin.ignore(IGNORE_CHARS, '\n');
+			std::cout << error << std::endl;
 			input_failure = true;
 		}
 		else
@@ -104,7 +121,7 @@ int get_integer(const std::string prompt, const std::string error, const int val
 			}
 
 
-			cout << error << endl;
+			std::cout << error << std::endl;
 			input_failure = true;
 		}
 

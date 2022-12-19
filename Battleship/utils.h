@@ -1,7 +1,11 @@
 #pragma once
 
+
 #ifndef __UTILS_H__
 #define __UTILS_H__
+#include <iostream>
+#include <cctype>
+#include <string>
 
 enum character_casetype
 {
@@ -12,7 +16,7 @@ enum character_casetype
 
 
 char get_character(const std::string prompt, const std::string error);
-char get_character(const std::string prompt, const std::string error, character_casetype char_case);
+char get_character(const std::string prompt, const std::string error, const char validInput[], int validInputLength, character_casetype char_case);
 
 int get_integer(const std::string prompt, const std::string error, const int valid_input[], int valid_inputlength);
 

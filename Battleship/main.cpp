@@ -8,6 +8,7 @@
 //error string
 std::string prompt{ "Would you like to play again? (y/n)" };
 std::string error{ "invalid character entered, please try again! " };
+const std::string INPUT_ERROR_STRING = "Input error! Please try again.";
 
 //constants-anonymous enum with a bunch of values
 enum
@@ -87,7 +88,6 @@ void initialize_player(Player& player, std::string  player_name);
 
 void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type);
 
-
 void play_game(Player& player1, Player& player2);
 
 bool want_to_play_again();
@@ -108,7 +108,11 @@ char get_guess_representation_at(const Player& player, int row, int col);
 
 char get_ship_representation_at(const Player& player, int row, int col);
 
+Ship_position_type get_board_position();
+
 std::string get_shipname_for_shiptype(Ship_type ship_type);
+
+Ship_position_type map_board_position(char row_input, int col_input);
 
 int main() {
 
@@ -155,7 +159,7 @@ bool want_to_play_again()
 
     const char valid_input[2] = { 'y', 'n' };
 
-    input = get_character(prompt, error, CC_LOWER_CASE);
+    input = get_character(prompt, INPUT_ERROR_STRING, valid_input, 2, CC_LOWER_CASE);
 
     return input == 'y';
 }
@@ -180,6 +184,7 @@ void setup_board(Player& player)
 
             std::cout << player.player_name << " please set the position and orientation for your " <<
                 get_shipname_for_shiptype(current_ship.ship_type) << std::endl;
+            ship_position = get_board_position();
 
         } while (!is_valid_placement);
 
@@ -196,6 +201,20 @@ void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type)
     ship.position.col = 0;
     ship.orientation = SO_HORIZONTAL;
 }
+
+Ship_position_type map_board_position(char row_input, int col_input)
+{
+    int real_row = row_input - 'A';
+    int real_col = col_input - 1;
+
+    Ship_position_type board_position;
+
+    board_position.row = real_row;
+    board_position.col = real_col;
+
+    return board_position;
+}
+
 
 void clear_boards(Player& player)
 {
@@ -367,4 +386,19 @@ std::string get_shipname_for_shiptype(Ship_type ship_type) {
         return "None";
     }
 
+}
+
+Ship_position_type get_board_position()
+{
+
+    char row_input;
+    int col_input;
+
+    const char valid_row_input[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I','J' };
+    const int valid_col_input[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9','10' };
+
+    row_input = get_character("Please input a row (A - J): ", INPUT_ERROR_STRING, valid_row_input, BOARD_SIZE, CC_UPPER_CASE);
+    col_input = get_integer("Please input a column (1 - 10)", INPUT_ERROR_STRING, valid_col_input, BOARD_SIZE);
+
+    return map_board_position(row_input, col_input);
 }
