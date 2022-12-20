@@ -114,13 +114,19 @@ std::string get_shipname_for_shiptype(Ship_type ship_type);
 
 Ship_position_type map_board_position(char row_input, int col_input);
 
+ship_orientation get_ship_orientation();
+
+bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation);
+
+void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation);
+
 int main() {
 
     Player player1;
     Player player2;
 
     initialize_player(player1, "Player1");
-    initialize_player(player1, "Player2");
+    initialize_player(player2, "Player2");
 
     do
     {
@@ -184,13 +190,24 @@ void setup_board(Player& player)
 
             std::cout << player.player_name << " please set the position and orientation for your " <<
                 get_shipname_for_shiptype(current_ship.ship_type) << std::endl;
+
             ship_position = get_board_position();
+            orientation = get_ship_orientation();
+
+            is_valid_placement = is_valid_placement_func(player, current_ship, ship_position, orientation);
+
+            if (!is_valid_placement)
+            {
+                std::cout << "That was not a valid placement. Please try again." << std::endl;
+            }
 
         } while (!is_valid_placement);
 
+        place_ship_onboard(player, current_ship, ship_position, orientation);
     }
 
     draw_boards(player);
+    wait_for_keypress();
 }
 
 void initialize_ship(Ship& ship, int ship_size, Ship_type ship_type)
@@ -236,7 +253,7 @@ void draw_shipboard_row(const Player& player, int row)
 
     for (int c = 0; c < BOARD_SIZE; c++)
     {
-        std::cout << " " << " " << " |";
+        std::cout << " " << get_ship_representation_at(player, row, c) << " |";
     }
 }
 
@@ -395,10 +412,76 @@ Ship_position_type get_board_position()
     int col_input;
 
     const char valid_row_input[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I','J' };
-    const int valid_col_input[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9','10' };
+    const int valid_col_input[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9,10 };
 
     row_input = get_character("Please input a row (A - J): ", INPUT_ERROR_STRING, valid_row_input, BOARD_SIZE, CC_UPPER_CASE);
     col_input = get_integer("Please input a column (1 - 10)", INPUT_ERROR_STRING, valid_col_input, BOARD_SIZE);
 
     return map_board_position(row_input, col_input);
+}
+
+ship_orientation get_ship_orientation()
+{
+
+    const char valid_input[2] = { 'H', 'V' };
+
+    char input = get_character("Please choose an orientation (H) for Horizontal or (V) for vertical)", INPUT_ERROR_STRING, valid_input, 2, CC_UPPER_CASE);
+
+    if (input == valid_input[0])
+    {
+        return SO_HORIZONTAL;
+    }
+    else
+    {
+        return SO_VERTICAL;
+    }
+}
+
+bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation)
+{
+
+    if (orientation == SO_HORIZONTAL)
+    {
+        for (int c = ship_position.col; c < (ship_position.col + current_ship.ship_size); c++)
+        {
+            if ((player.ship_board[ship_position.row][c].ship_type != ST_NONE) || (c >= BOARD_SIZE))
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        for (int r = ship_position.row; r < (ship_position.row + current_ship.ship_size); r++)
+        {
+            if ((player.ship_board[r][ship_position.col].ship_type != ST_NONE) || (r >= BOARD_SIZE))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation)
+{
+    current_ship.position = ship_position;
+    current_ship.orientation = orientation;
+
+    if (orientation == SO_HORIZONTAL)
+    {
+        for (int c = ship_position.col; c < (ship_position.col + current_ship.ship_size); c++)
+        {
+            player.ship_board[ship_position.row][c].ship_type = current_ship.ship_type;
+            player.ship_board[ship_position.row][c].is_hit = false;
+        }
+    }
+    else
+    {
+        for (int r = ship_position.row; r < (ship_position.row + current_ship.ship_size); r++)
+        {
+            player.ship_board[r][ship_position.col].ship_type = current_ship.ship_type;
+            player.ship_board[r][ship_position.col].is_hit = false;
+        }
+    }
 }
