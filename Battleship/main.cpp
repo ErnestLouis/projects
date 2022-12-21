@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "utils.h"
+#include <ctime>
 
 //error string
 std::string prompt{ "Would you like to play again? (y/n)" };
@@ -11,7 +12,7 @@ std::string error{ "invalid character entered, please try again! " };
 const std::string INPUT_ERROR_STRING = "Input error! Please try again.";
 
 //constants-anonymous enum with a bunch of values
-enum
+enum Class
 {
     AIRCRAFT_CARRIER_SIZE = 5,
     BATTLESHIP_SIZE = 4,
@@ -36,7 +37,7 @@ enum Ship_type
 };
 
 
-enum ship_orientation
+enum Ship_orientation
 {
     SO_HORIZONTAL = 0,
     SO_VERTICAL
@@ -52,7 +53,7 @@ struct Ship
 {
     Ship_type ship_type;
     int ship_size;
-    ship_orientation orientation;
+    Ship_orientation orientation;
     Ship_position_type position;
 };
 
@@ -72,10 +73,18 @@ struct ship_part_type//because 1 squre on the board
     bool is_hit;
 };
 
+enum Player_type
+{
+    PT_HUMAN = 0,
+    PT_AI
+
+};
+
 //Player
 //------
 struct Player
 {
+    Player_type player_type;
     //char player_name[PLAYER_NAME_SIZE];
     std::string player_name;
     Ship ships[NUM_SHIPS];
@@ -114,11 +123,11 @@ std::string get_shipname_for_shiptype(Ship_type ship_type);
 
 Ship_position_type map_board_position(char row_input, int col_input);
 
-ship_orientation get_ship_orientation();
+Ship_orientation get_ship_orientation();
 
-bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation);
+bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, Ship_orientation orientation);
 
-void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation);
+void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, Ship_orientation orientation);
 
 Ship_type update_boards(Ship_position_type guess, Player& current_player, Player& other_player);
 
@@ -132,7 +141,16 @@ void switch_player(Player** current_player, Player** other_player);
 
 void display_winner(const Player& player1, const Player& player2);
 
+Player_type get_player2_type();
+
+Ship_position_type get_ai_guess(const Player& ai_player);
+
+void setup_ai_boards(Player& player);
+
+Ship_position_type get_random_position();
+
 int main() {
+    std::srand(std::time(0));
 
     Player player1;
     Player player2;
@@ -167,6 +185,11 @@ void initialize_player(Player& player, std::string  player_name)
 
 void play_game(Player& player1, Player& player2)
 {
+    clear_screen();
+
+    player1.player_type = PT_HUMAN;
+    player2.player_type = get_player2_type();
+
     setup_board(player1);
     setup_board(player2);
 
@@ -177,20 +200,28 @@ void play_game(Player& player1, Player& player2)
 
     do
     {
-        draw_boards(*current_player);
+        if (current_player->player_type == PT_HUMAN)
+        {
+            draw_boards(*current_player);
+        }
 
         bool is_valid_guess;
 
         do
         {
+            if (current_player->player_type == PT_HUMAN)
+            {
+                std::cout << current_player->player_name << " what is your guess?" << std::endl;
 
-            std::cout << current_player->player_name << " what is your guess?" << std::endl;
-
-            guess = get_board_position();
-
+                guess = get_board_position();
+            }
+            else
+            {
+                guess = get_ai_guess(*current_player);
+            }
             is_valid_guess = current_player->guess_board[guess.row][guess.col] == GT_NONE;
 
-            if (!is_valid_guess)
+            if (!is_valid_guess && current_player->player_type == PT_HUMAN)
             {
                 std::cout << "That was not a valid guess! Please try again." << std::endl;
             }
@@ -198,11 +229,30 @@ void play_game(Player& player1, Player& player2)
         } while (!is_valid_guess);
 
         Ship_type type = update_boards(guess, *current_player, *other_player);
-        draw_boards(*current_player);
+
+        if (current_player->player_type == PT_AI)
+        {
+            draw_boards(*other_player);
+            std::cout << current_player->player_name << " chose row " << static_cast<char>(guess.row + 'A') <<
+                " and column " << guess.col + 1 << std::endl;
+        }
+        else
+        {
+            draw_boards(*current_player);
+        }
+
 
         if (type != ST_NONE && is_sunk(*other_player, other_player->ships[type - 1]))
         {
-            std::cout << "You sunk " << other_player->player_name << "'s " << get_shipname_for_shiptype(type) << "!" << std::endl;
+            if (current_player->player_type == PT_AI)
+            {
+                std::cout << current_player->player_name << " sunk your " << get_shipname_for_shiptype(type) << "!" << std::endl;
+            }
+            else
+            {
+                std::cout << "You sunk " << other_player->player_name << "'s " << get_shipname_for_shiptype(type) << "!" << std::endl;
+
+            }
         }
 
         wait_for_keypress();
@@ -228,6 +278,12 @@ void setup_board(Player& player)
 {
     clear_boards(player);
 
+    if (player.player_type == PT_AI)
+    {
+        setup_ai_boards(player);
+        return;
+    }
+
     for (int i = 0; i < NUM_SHIPS; i++) {
 
         draw_boards(player);
@@ -235,7 +291,7 @@ void setup_board(Player& player)
         Ship& current_ship = player.ships[i];
 
         Ship_position_type ship_position;
-        ship_orientation orientation;
+        Ship_orientation orientation;
 
         bool is_valid_placement = false;
 
@@ -477,7 +533,7 @@ Ship_position_type get_board_position()
     return map_board_position(row_input, col_input);
 }
 
-ship_orientation get_ship_orientation()
+Ship_orientation get_ship_orientation()
 {
 
     const char valid_input[2] = { 'H', 'V' };
@@ -494,7 +550,7 @@ ship_orientation get_ship_orientation()
     }
 }
 
-bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation)
+bool is_valid_placement_func(const Player& player, const Ship& current_ship, const Ship_position_type& ship_position, Ship_orientation orientation)
 {
 
     if (orientation == SO_HORIZONTAL)
@@ -520,7 +576,7 @@ bool is_valid_placement_func(const Player& player, const Ship& current_ship, con
     return true;
 }
 
-void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation)
+void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, Ship_orientation orientation)
 {
     current_ship.position = ship_position;
     current_ship.orientation = orientation;
@@ -625,4 +681,57 @@ void display_winner(const Player& player1, const Player& player2)
     {
         std::cout << "Congratulations " << player1.player_name << "! You won!" << std::endl;
     }
+}
+
+Player_type get_player2_type()
+{
+    const int valid_input[2] = { 1,2 };
+
+    int input = get_integer("Who would you like to play against?\n1. Human\n2. AI\n\nWhat is your choice? ", INPUT_ERROR_STRING, valid_input, 2);
+
+    if (input == 1)
+    {
+        return PT_HUMAN;
+    }
+    else
+    {
+        return PT_AI;
+    }
+}
+Ship_position_type get_random_position()
+{
+    Ship_position_type guess;
+
+    guess.row = rand() % BOARD_SIZE;
+    guess.col = rand() % BOARD_SIZE;
+
+    return guess;
+}
+
+Ship_position_type get_ai_guess(const Player& ai_player)
+{
+    return get_random_position();
+}
+
+void setup_ai_boards(Player& player)
+{
+    Ship_position_type pos;
+    Ship_orientation orientation;
+
+    for (int i = 0; i < NUM_SHIPS; i++)
+    {
+        Ship& current_ship = player.ships[i];
+
+        do
+        {
+            pos = get_random_position();
+            orientation = Ship_orientation(rand() % 2);
+
+
+        } while (!is_valid_placement_func(player, current_ship, pos, orientation));
+
+        place_ship_onboard(player, current_ship, pos, orientation);
+    }
+
+
 }
