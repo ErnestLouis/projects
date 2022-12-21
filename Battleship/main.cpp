@@ -120,6 +120,18 @@ bool is_valid_placement_func(const Player& player, const Ship& current_ship, con
 
 void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_type& ship_position, ship_orientation orientation);
 
+Ship_type update_boards(Ship_position_type guess, Player& current_player, Player& other_player);
+
+bool is_game_over(const Player& player1, const Player& player2);
+
+bool are_all_ship_sunk(const Player& player);
+
+bool is_sunk(const Player& player, const Ship& ship);
+
+void switch_player(Player** current_player, Player** other_player);
+
+void display_winner(const Player& player1, const Player& player2);
+
 int main() {
 
     Player player1;
@@ -157,6 +169,48 @@ void play_game(Player& player1, Player& player2)
 {
     setup_board(player1);
     setup_board(player2);
+
+    Player* current_player = &player1;
+    Player* other_player = &player2;
+
+    Ship_position_type guess;
+
+    do
+    {
+        draw_boards(*current_player);
+
+        bool is_valid_guess;
+
+        do
+        {
+
+            std::cout << current_player->player_name << " what is your guess?" << std::endl;
+
+            guess = get_board_position();
+
+            is_valid_guess = current_player->guess_board[guess.row][guess.col] == GT_NONE;
+
+            if (!is_valid_guess)
+            {
+                std::cout << "That was not a valid guess! Please try again." << std::endl;
+            }
+
+        } while (!is_valid_guess);
+
+        Ship_type type = update_boards(guess, *current_player, *other_player);
+        draw_boards(*current_player);
+
+        if (type != ST_NONE && is_sunk(*other_player, other_player->ships[type - 1]))
+        {
+            std::cout << "You sunk " << other_player->player_name << "'s " << get_shipname_for_shiptype(type) << "!" << std::endl;
+        }
+
+        wait_for_keypress();
+        switch_player(&current_player, &other_player);
+
+    } while (!is_game_over(player1, player2));
+
+    display_winner(player1, player2);
 }
 
 bool want_to_play_again()
@@ -199,6 +253,7 @@ void setup_board(Player& player)
             if (!is_valid_placement)
             {
                 std::cout << "That was not a valid placement. Please try again." << std::endl;
+                wait_for_keypress();
             }
 
         } while (!is_valid_placement);
@@ -270,6 +325,8 @@ void draw_guessboard_row(const Player& player, int row)
 
 void draw_boards(const Player& player)
 {
+    clear_screen();  //sceen clears after each completed entry
+
     draw_columns_row();
 
     draw_columns_row();
@@ -290,7 +347,7 @@ void draw_boards(const Player& player)
 
         std::cout << " ";
 
-        draw_shipboard_row(player, r);
+        draw_guessboard_row(player, r);
 
         std::cout << std::endl;
     }
@@ -483,5 +540,89 @@ void place_ship_onboard(Player& player, Ship& current_ship, const Ship_position_
             player.ship_board[r][ship_position.col].ship_type = current_ship.ship_type;
             player.ship_board[r][ship_position.col].is_hit = false;
         }
+    }
+}
+
+Ship_type update_boards(Ship_position_type guess, Player& current_player, Player& other_player)
+{
+    if (other_player.ship_board[guess.row][guess.col].ship_type != ST_NONE)
+    {
+        //hit
+        current_player.guess_board[guess.row][guess.col] = GT_HIT;
+        other_player.ship_board[guess.row][guess.col].is_hit = true;
+
+    }
+    else
+    {
+        //not a hit
+        current_player.guess_board[guess.row][guess.col] = GT_MISSED;
+    }
+
+    return other_player.ship_board[guess.row][guess.col].ship_type;
+
+}
+
+bool is_sunk(const Player& player, const Ship& ship)
+{
+    if (ship.orientation == SO_HORIZONTAL)
+    {
+        for (int col = ship.position.col; col < (ship.position.col + ship.ship_size); col++)
+        {
+            if (!player.ship_board[ship.position.row][col].is_hit)
+            {
+                return false;
+            }
+        }
+    }
+
+    else
+    {
+        for (int row = ship.position.row; row < (ship.position.row + ship.ship_size); row++)
+        {
+            if (!player.ship_board[row][ship.position.col].is_hit)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool are_all_ship_sunk(const Player& player)
+{
+    for (int i = 0; i < NUM_SHIPS; i++)
+    {
+        if (!is_sunk(player, player.ships[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+bool is_game_over(const Player& player1, const Player& player2)
+{
+    return are_all_ship_sunk(player1) || are_all_ship_sunk(player2);
+}
+
+void switch_player(Player** current_player, Player** other_player)
+{
+    Player* temp_player = *current_player;
+    *current_player = *other_player;
+    *other_player = temp_player;
+
+}
+
+void display_winner(const Player& player1, const Player& player2)
+{
+    if (are_all_ship_sunk(player1))
+    {
+        std::cout << "Congratulations " << player2.player_name << "! You won!" << std::endl;
+    }
+    else if (are_all_ship_sunk(player2))
+    {
+        std::cout << "Congratulations " << player1.player_name << "! You won!" << std::endl;
     }
 }
