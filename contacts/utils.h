@@ -18,6 +18,7 @@ enum character_casetype
 char get_character(const std::string prompt, const std::string error);
 char get_character(const std::string prompt, const std::string error, const char validInput[], int validInputLength, character_casetype char_case);
 
+std::string get_string(const std::string prompt, const std::string error, std::string& text);
 int get_integer(const std::string prompt, const std::string error, const int valid_input[], int valid_inputlength);
 
 void clear_screen();
