@@ -55,7 +55,13 @@ public:
 
 	float avg();
 
-	Array* merge(Array<T>& arr2);
+	Array* merge(Array<T> & arr2);
+
+	Array* set_union(Array<T>& arr2);
+
+	Array* set_intersection(Array<T>& arr2);
+
+	Array* set_difference(Array<T>& arr2);
 
 	T remove(int index);
 
@@ -93,27 +99,41 @@ void wait_for_keypress()
 
 int main()
 {
-
+	
 	Array<int> arr;
-
+	
+	arr.append(5);
 	arr.append(7);
-	arr.append(9);
 	arr.append(11);
+	arr.append(12);
+	arr.append(17);
+	arr.append(19);
+	
+
+
 
 	Array<int> arr2;
 
+
+	
 	arr2.append(6);
-	arr2.append(10);
+	arr2.append(8);
+	arr2.append(11);
 	arr2.append(12);
+	arr2.append(14);
+	arr2.append(19);
+	
+
+
 
 
 	//arr.remove(1);
 
 
 
-	Array<int>* arr3;
+	Array<int> * arr3;
 
-	arr3 = arr.merge(arr2);
+	arr3 = arr.set_intersection(arr2);
 
 	arr3->display();
 	/*
@@ -128,7 +148,7 @@ int main()
 			arr.display();
 			arr.rotate_right();
 		}
-
+		
 		wait_for_keypress();
 		clear_screen();
 
@@ -149,12 +169,12 @@ int main()
 	//std::cout << arr.binary_search(num) << std::endl;
 	//std::cout << arr.linear_search(num) << std::endl;
 	//std::cout << arr.rbinary_search(0,6,num) << std::endl;
-
+	
 	//arr.set(0, 12);
 	//std::cout << arr.avg() <<std::endl;
 	arr.rotate_right();
 	arr.display();
-
+	
 
 	//std::cout << "After removal." << std::endl;
 	//arr.display();
@@ -190,7 +210,7 @@ int main()
 
 		//wait_for_keypress();
 		for (int i = 0; i < 100000000; i++) {
-
+			
 		}
 		clear_screen();
 
@@ -199,7 +219,7 @@ int main()
 
 	*/
 
-
+	
 }
 
 //display
@@ -224,7 +244,7 @@ void Array<T>::insert(int index, T x)
 	{
 		for (int i = length; i > index; i--)
 		{
-			A[i] = A[i - 1];
+			A[i] = A[i-1];
 		}
 		A[index] = x;
 		length++;
@@ -233,12 +253,12 @@ void Array<T>::insert(int index, T x)
 
 //Delete
 template<class T>
-T Array<T>::remove(int index)
+T Array<T>::remove(int index)  
 {
 	T x = 0;
 	if (index >= 0 && index < length)
 	{
-		x = A[index];
+		x = A[index];     
 		for (int i = index; i < length - 1; i++)
 		{
 			A[i] = A[i + 1];
@@ -258,15 +278,15 @@ void Array<T>::append(T x)
 
 //Linear_Search
 template <class T>
-T Array<T>::linear_search(T key)
+T Array<T>::linear_search(T key) 
 {
 	int i;
 	for (i = 0; i < length; i++)
 	{
 		if (key == A[i]) //<------ Type the line of code that goes here
 		{
-			std::swap(A[i], A[0]);
-			return i;
+			std::swap(A[i], A[0]); 
+			return i; 
 		}
 	}
 	return -1;
@@ -276,7 +296,7 @@ T Array<T>::linear_search(T key)
 template <class T>
 T Array<T>::binary_search(T key)
 {
-	int h = length - 1;    //<------ Type the line of code that goes here
+	int h = length - 1;    
 	int l = 0;
 
 	while (l <= h)
@@ -300,7 +320,7 @@ T Array<T>::binary_search(T key)
 
 //RBinary_Search
 template <class T>
-T Array<T>::rbinary_search(int l, int h, T key)     //<------ Type the line of code that goes here
+T Array<T>::rbinary_search(int l, int h, T key)    
 {
 	//h = length - 1;
 	//l = 0;
@@ -328,7 +348,7 @@ T Array<T>::rbinary_search(int l, int h, T key)     //<------ Type the line of c
 
 //get
 template <class T>
-T Array<T>::get(int index) //<---------- What is the Array member function name?
+T Array<T>::get(int index) 
 {
 	if (index >= 0 && index < length)
 	{
@@ -353,7 +373,7 @@ void Array<T>::set(int index, T x)
 template <class T>
 T Array<T>::max()
 {
-	int big = A[0];    //<------ Type the line of code that goes here
+	int big = A[0];   
 
 	for (int i{}; i < length; i++)
 	{
@@ -410,11 +430,11 @@ void Array<T>::reverse()
 }
 
 template <class T>
-void Array<T>::shift_right()
+void Array<T>::shift_right()    
 {
-	int zero{ 0 };
+	int zero{ 0 };     
 
-	for (int i = length - 1; i >= 0; i--)  //<------ Type the line of code that goes here
+	for (int i = length - 1;  i >= 0; i--)  
 	{
 		A[i + 1] = A[i];
 	}
@@ -424,11 +444,11 @@ void Array<T>::shift_right()
 }
 
 template <class T>
-void Array<T>::shift_left()
+void Array<T>::shift_left()   
 {
 	int zero{ 0 };
 
-	for (int i = 0; i < length - 1; i++)
+	for (int i = 0; i < length - 1; i++) 
 	{
 		A[i] = A[i + 1];
 	}
@@ -439,9 +459,9 @@ void Array<T>::shift_left()
 
 
 template <class T>
-void Array<T>::rotate_right()
+void Array<T>::rotate_right()   
 {
-	int lost_var = A[length - 1];
+	int lost_var = A[length - 1 ] ;
 
 
 	for (int i = length - 1; i >= 0; i--)
@@ -454,7 +474,7 @@ void Array<T>::rotate_right()
 }
 
 template <class T>
-void Array<T>::rotate_left()
+void Array<T>::rotate_left()   
 {
 	int lost_var = A[0];
 
@@ -467,11 +487,11 @@ void Array<T>::rotate_left()
 
 }
 template <class T>
-bool Array<T>::is_sorted()
+bool Array<T>::is_sorted() 
 {
 	for (int i = 0; i < length - 1; i++)
 	{
-		if (A[i] > A[i + 1]) //<------ Type the line of code that goes here
+		if (A[i] > A[i + 1]) 
 		{
 			return false;
 		}
@@ -481,10 +501,10 @@ bool Array<T>::is_sorted()
 }
 
 template <class T>
-void Array<T>::insert_sort(int x)
+void Array<T>::insert_sort(int x) 
 {
 	int i = length - 1;
-	if (length == size)  //<------ Type the line of code that goes here
+	if (length == size)  
 	{
 		return;
 	}
@@ -498,24 +518,24 @@ void Array<T>::insert_sort(int x)
 }
 
 template<class T>
-void Array<T>::rearrange()
+void Array<T>::rearrange()  
 {
 	int i = 0;
 	int j = length - 1;
 
 	while (i < j)
 	{
-		while (A[i] < 0) i++;   //<------ Type the line of code that goes here
+		while (A[i] < 0) i++;   
 		while (A[j] >= 0) j--;
-		if (i < j)
-		{
-			std::swap(A[i], A[j]);
-		}
+			if (i < j)
+			{
+				std::swap(A[i], A[j]);
+			}
 	}
 
 }
 template<class T>
-Array<T>* Array<T>::merge(Array<T>& arr2)
+Array<T>* Array<T>::merge(Array<T> & arr2)  
 {
 	int i, j, k;
 	i = j = k = 0;
@@ -547,6 +567,111 @@ Array<T>* Array<T>::merge(Array<T>& arr2)
 
 	return arr3;
 }
+
+
+template<class T>
+Array<T>* Array<T>::set_union(Array<T>& arr2)
+{
+	int i, j, k;
+	i = j = k = 0;
+
+	Array<T>* arr3 = new Array<T>(length + arr2.length);
+
+	while (i < length && j < arr2.length)
+	{
+		if (A[i] < arr2.A[j])
+		{
+			arr3->A[k++] = A[i++];
+		}
+		else if (A[i] > arr2.A[j])
+		{
+			arr3->A[k++] = arr2.A[j++];
+		}
+		else if (A[i] == arr2.A[j])
+		{
+			arr3->A[k++] = arr2.A[j++];
+			i++;
+		}
+
+	}
+	for (; i < length; i++)
+	{
+		arr3->A[k++] = A[i];
+	}
+	for (; j < arr2.length; j++)
+	{
+		arr3->A[k++] = arr2.A[j];
+	}
+	arr3->length = k; //k equals length + arr2.length
+
+	return arr3;
+}
+
+template<class T>
+Array<T>* Array<T>::set_intersection(Array<T>& arr2)
+{
+	int i, j, k;
+	i = j = k = 0;
+
+	Array<T>* arr3 = new Array<T>(length + arr2.length);
+
+	while (i < length && j < arr2.length)
+	{
+		if (A[i] < arr2.A[j])
+		{
+			i++;
+		}
+		else if (A[i] > arr2.A[j])						
+		{													
+			j++;
+		}
+		else if (A[i] == arr2.A[j])
+		{
+			arr3->A[k++] = arr2.A[j++];
+			i++;
+		}
+
+	}
+
+	
+	arr3->length = k; //k equals length + arr2.length
+
+	return arr3;
+}
+
+template<class T>
+Array<T>* Array<T>::set_difference(Array<T>& arr2)
+{
+	int i, j, k;
+	i = j = k = 0;
+
+	Array<T>* arr3 = new Array<T>(length + arr2.length);
+
+	while (i < length && j < arr2.length)
+	{
+		if (A[i] < arr2.A[j])
+		{
+			arr3->A[k++] = A[i++];
+		}
+		else if (A[i] == arr2.A[j])
+		{
+			j++;
+			i++;
+		}
+		else
+		{
+			j++;
+		}
+
+
+	}
+
+
+	arr3->length = k; //k equals length + arr2.length
+
+	return arr3;
+}
+
 
 //<------ Type the line of code that goes here
 //<---------- What is the Array member function name?
