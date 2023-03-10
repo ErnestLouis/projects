@@ -37,6 +37,7 @@ public:
 	void reverse();
 	void remove_duplicate();
 
+
 	T remove(int index);
 	T sum();
 	T max();
@@ -64,7 +65,7 @@ public:
 
 int main()
 {
-	int A[] = { 5,10,10,10,15};
+	int A[] = { 5,15,20,18,15};
 
 	int num = arr_size(A);
 
@@ -74,7 +75,7 @@ int main()
 
 	//double total = link01.avg();
 
-	link01.remove_duplicate();
+	link01.remove(1);
 
 	link01.display();
 
@@ -114,7 +115,6 @@ LinkedList<T>::LinkedList(T Arr[], int num_of_elements)
 		last->next = new_node;
 		last = new_node;
 	}
-
 }
 
 template<class T>
@@ -154,8 +154,6 @@ void LinkedList<T>::rec_display()
 		p = p->next;
 		rec_display();
 	}
-
-
 }
 
 template<class T>
@@ -280,9 +278,34 @@ void LinkedList<T>::remove_duplicate()
 template<class T>
 T LinkedList<T>::remove(int index)
 {
-	Node<T>* p = first;
+	Node<T>* p = first, * q = NULL;
+	int x = -1;
 
-
+	if (index < 1 || index > length())
+	{
+		return -1;
+	}
+	if (index == 1)
+	{
+		q = first;
+		x = first->data;
+		first = first->next;
+		delete q;
+		return x;
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			q = p;
+			p = p->next;
+		}
+		q->next = p->next;
+		x = p->data;
+		delete p;
+		return x;
+	}
+	
 }
 
 template<class T>
