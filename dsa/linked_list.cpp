@@ -4,7 +4,8 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-int arr_size(int A[]);
+
+template <typename F> int arr_size(F A[]);
 
 template <class Type>
 class Node
@@ -34,9 +35,8 @@ public:
 	void insert_sort(T data);
 	void append(T data);
 	void reverse();
-	void rec_reverse();
+	void remove_duplicate();
 
-	T remove_duplicate();
 	T remove(int index);
 	T sum();
 	T max();
@@ -52,7 +52,10 @@ public:
 	LinkedList* concat(LinkedList<T>& arr2);
 	LinkedList* merge(LinkedList<T>& arr2);
 
-
+	Node<T>* get_first()
+	{
+		return this->first;
+	}
 
 };
 
@@ -61,48 +64,21 @@ public:
 
 int main()
 {
-	int A[] = { 2,3,4,5};
+	int A[] = { 5,10,10,10,15};
 
-	int num = 6;
+	int num = arr_size(A);
 
-	LinkedList link01(A, arr_size(A));
-
-	link01.display();
-
-	link01.insert_sort(num);
+	LinkedList link01(A,num);
 
     link01.display();
 
+	//double total = link01.avg();
 
-	/*
-	cout << " before append: \n";
-
-	link01.display();
-
-	std::cout << endl;
-
-	link01.append(num);
-
-	std::cout << "Appended " << num << " into last index \n";
+	link01.remove_duplicate();
 
 	link01.display();
 
-	*/
 
-
-/*
-	cout << " before insertion: \n";
-
-	link01.display();
-
-	std::cout << endl;
-
-	link01.insert(5,num);
-
-	std::cout << "Insert " << num << " into index 5: \n";
-
-	link01.display();
-*/
 
 
 
@@ -267,31 +243,44 @@ void LinkedList<T>::insert_sort(T data)
 template<class T>
 void LinkedList<T>::reverse()
 {
+	Node<T>* p = first, *q = NULL, *r = NULL;
 
-
-
+	while (p != NULL)
+	{
+		r = q;
+		q = p;
+		p = p->next;
+		q->next = r;
+	}
+	first = q;
 }
 
 template<class T>
-void LinkedList<T>::rec_reverse()
+void LinkedList<T>::remove_duplicate()
 {
+	Node<T>* p = first;
+	Node<T>* q = p->next;
 
-
-
-}
-
-template<class T>
-T LinkedList<T>::remove_duplicate()
-{
-
-
-
+	while (q != NULL)
+	{
+		if (p->data != q->data)
+		{
+			p = q;
+			q = q->next;
+		}
+		else
+		{
+			p->next = q->next;
+			delete q;
+			q = p->next;
+		}
+	}
 }
 
 template<class T>
 T LinkedList<T>::remove(int index)
 {
-
+	Node<T>* p = first;
 
 
 }
@@ -299,25 +288,48 @@ T LinkedList<T>::remove(int index)
 template<class T>
 T LinkedList<T>::sum()
 {
-
-
-
+	Node<T>* p = first;
+	double total = 0;
+	while (p)
+	{
+		total = total + p->data;
+		p = p->next;
+	}
+	return total;
 }
 
 template<class T>
 T LinkedList<T>::max()
 {
+	Node<T>* p = first;
+	int max_num{ INT_MIN };
 
-
-
+	while (p)
+	{
+		if (p->data > max_num)
+		{
+			max_num = p->data;
+		}
+		p = p->next;
+	}
+	return max_num;
 }
 
 template<class T>
 T LinkedList<T>::min()
 {
+	Node<T>* p = first;
+	int min_num{ INT_MAX };
 
-
-
+	while (p)
+	{
+		if (p->data < min_num)
+		{
+			min_num = p->data;
+		}
+		p = p->next;
+	}
+	return min_num;
 }
 
 template<class T>
@@ -350,7 +362,7 @@ bool LinkedList<T>::is_sort()
 template<class T>
 bool LinkedList<T>::has_loop()
 {
-
+	Node<T>* p = first;
 
 
 }
@@ -358,9 +370,7 @@ bool LinkedList<T>::has_loop()
 template<class T>
 double LinkedList<T>::avg()
 {
-
-
-
+	return sum() / length();
 }
 
 template<class T>
@@ -398,7 +408,7 @@ int LinkedList<T>::rec_length()
 template<class T>
 LinkedList<T>* LinkedList<T>::concat(LinkedList<T>& arr2)
 {
-
+	Node<T>* p = first;
 
 
 }
@@ -406,12 +416,12 @@ LinkedList<T>* LinkedList<T>::concat(LinkedList<T>& arr2)
 template<class T>
 LinkedList<T>* LinkedList<T>::merge(LinkedList<T>& arr2)
 {
-
+	Node<T>* p = first;
 
 
 }
 
-int arr_size(int A[])
+template <typename F> int arr_size(F A[])
 {
 	int j = 0;
 	int* a = new int[100];
