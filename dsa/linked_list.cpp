@@ -4,7 +4,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-
+//figure out why the destructor is causing the merge to break. it may be deleting multiple times.
 template <typename F> int arr_size(F A[]);
 
 template <class Type>
@@ -15,6 +15,8 @@ public:
 	Node* next;
 };
 
+//template <typename T>
+//Node<T>* third = new Node<T>;
 
 template <class T>
 class LinkedList
@@ -27,7 +29,7 @@ public:
 
 	LinkedList();
 	LinkedList(T A[], int num_of_elements);
-	~LinkedList();
+	//~LinkedList();
 
 	void display();
 	void rec_display();
@@ -36,6 +38,7 @@ public:
 	void append(T data);
 	void reverse();
 	void remove_duplicate();
+	void make_loop();
 
 
 	T remove(int index);
@@ -50,34 +53,74 @@ public:
 	int length();
 	int rec_length();
 
-	LinkedList* concat(LinkedList<T>& arr2);
-	LinkedList* merge(LinkedList<T>& arr2);
+	void concat(Node<T>* q);
+	
 
 	Node<T>* get_first()
 	{
-		return this->first;
+		return first;
 	}
+};
 
+template <class T>
+class LinkedList2
+{
+private:
+
+	Node<T>* second;
+
+public:
+
+	LinkedList2();
+	LinkedList2(T A[], int num_of_elements);
+	//~LinkedList2();
+
+	void display();
+	//void concat(Node<T>* q);
+	//LinkedList* merge(LinkedList<T>& arr2);
+
+	Node<T>* get_second()
+	{
+		return second;
+	}
 };
 
 
+template<typename T>
+void merge(Node<T>* p, Node<T>* q);
 
 
 int main()
 {
-	int A[] = { 5,15,20,18,15};
+	int A[] = { 1,2,3,4,5};
+	int B[] = { 6,7,8,9,10 };
 
-	int num = arr_size(A);
+	//int num = arr_size(A);
+
+	int num = 5;
 
 	LinkedList link01(A,num);
+	LinkedList2 link02(B, num);
 
-    link01.display();
+    //link01.display();
 
 	//double total = link01.avg();
 
-	link01.remove(1);
+	//std::cout << std::boolalpha;
+
+	//link01.make_loop();
+
+	//std::cout << link01.has_loop() << std::endl;
+
+	//link01.display();
+
+	//link01.concat(link02.get_first());
+
+	merge(link01.get_first(), link02.get_second());
 
 	link01.display();
+
+
 
 
 
@@ -116,7 +159,7 @@ LinkedList<T>::LinkedList(T Arr[], int num_of_elements)
 		last = new_node;
 	}
 }
-
+/*
 template<class T>
 LinkedList<T>::~LinkedList()
 {
@@ -127,8 +170,10 @@ LinkedList<T>::~LinkedList()
 		delete p;
 		p = first;
 	}
-}
 
+
+}
+*/
 
 template<class T>
 void LinkedList<T>::display()
@@ -375,19 +420,63 @@ T LinkedList<T>::linear_search(T key)
 }
 
 template<class T>
+void LinkedList<T>::make_loop()
+{
+	Node<T>* p = first;
+
+	while (p->next != NULL)
+	{
+		p = p->next;
+	}
+
+	p->next = first;
+
+}
+
+template<class T>
 bool LinkedList<T>::is_sort()
 {
+	Node<T>* p = first;
+	Node<T>* q = p->next;
 
-
-
+	while (q)
+	{
+		if (p->data > q->data)
+		{
+			return false;
+		}
+		else
+		{
+			p = q;
+			q = p->next;
+		}
+	}
+	return true;
 }
 
 template<class T>
 bool LinkedList<T>::has_loop()
 {
 	Node<T>* p = first;
+	Node<T>* q = p;
 
+	do
+	{
+			p = p->next;
+			q = q->next;
+			q = q ? q->next : q;
 
+	} while (p && q && (p != q));
+
+	if (p == q)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
 }
 
 template<class T>
@@ -429,20 +518,59 @@ int LinkedList<T>::rec_length()
 }
 
 template<class T>
-LinkedList<T>* LinkedList<T>::concat(LinkedList<T>& arr2)
+void LinkedList<T>::concat(Node<T>* q)
 {
 	Node<T>* p = first;
+	//Node<T>* second = q;
 
+	while (p->next != NULL)
+	{
+		p = p->next;
+	}
+	p->next = q;
+	
 
 }
 
-template<class T>
-LinkedList<T>* LinkedList<T>::merge(LinkedList<T>& arr2)
+template<typename T>
+void merge(Node<T>* p,Node<T>* q)
 {
-	Node<T>* p = first;
 
-
+	Node<T>* last;
+	if (p->data < q->data)
+	{
+		last = p;
+		p = p->next;
+		//third->next = NULL;
+	}
+	else
+	{
+		last = q;
+		q = q->next;
+		//third->next = NULL;
+	}
+	while (p && q)
+	{
+		if (p->data < q->data)
+		{
+			last->next = p;
+			last = p;
+			p = p->next;
+			last->next = NULL;
+		}
+		else
+		{
+			last->next = q;
+			last = q;
+			q = q->next;
+			last->next = NULL;
+		}
+	}
+	if (p)last->next = p;
+	if (q)last->next = q;
 }
+
+
 
 template <typename F> int arr_size(F A[])
 {
@@ -465,4 +593,86 @@ template <typename F> int arr_size(F A[])
 
 
 	return j;
+}
+
+
+
+/*
+
+template<class T>
+void LinkedList<T>::concat(LinkedList<T>& arr2)
+{
+	Node<T>* p = first;
+	Node<T>* second = arr2.first;
+
+	while (p->next != NULL)
+	{
+		p = p->next;
+	}
+	p->next = second;
+
+	first = NULL;
+	second = NULL;
+
+
+
+}
+
+*/
+
+//Linked list 2
+
+//Linked_list Implentations
+template<class T>
+LinkedList2<T>::LinkedList2()
+{
+	second = NULL;
+}
+
+
+template<class T>
+LinkedList2<T>::LinkedList2(T Arr[], int num_of_elements)
+{
+	Node<T>* new_node, * last;
+	second = new Node<T>;
+	second->data = Arr[0];
+	second->next = NULL;
+	last = second;
+
+	for (int i = 1; i < num_of_elements; i++)
+	{
+		new_node = new Node<T>;
+		new_node->data = Arr[i];
+		new_node->next = NULL;
+		last->next = new_node;
+		last = new_node;
+	}
+}
+/*
+template<class T>
+LinkedList2<T>::~LinkedList2()
+{
+	Node<T>* p = second;
+	while (second)
+	{
+		second = second->next;
+		delete p;
+		p = second;
+	}
+
+
+}
+*/
+
+template<class T>
+void LinkedList2<T>::display()
+{
+	Node<T>* p = second;
+
+	while (p)
+	{
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
 }
