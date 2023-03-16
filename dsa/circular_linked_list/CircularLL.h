@@ -18,13 +18,17 @@ class CircularLL
 
 	public:
 
-		CircularLL() {};
+		CircularLL() { head = NULL; };
 		CircularLL(int A[], int num_of_elements);
 		~CircularLL();
 
 		int get();
 		int set(int index);
+		int length();
+
 		void display();
+		void insert(int index, int num);
+		int remove(int index);
 
 
 

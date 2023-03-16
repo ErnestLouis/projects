@@ -48,7 +48,107 @@ CircularLL::~CircularLL()
 	if (p == head)
 	{
 		delete head;
-		head == nullptr;
+		head = nullptr;
 	}
 
+}
+
+int CircularLL::length()
+{
+	Node* p = head;
+	int len = 0;
+	do
+	{
+		len++;
+		p = p->next;
+	} while (p != head);
+
+	return len;
+}
+
+void CircularLL::insert(int index, int num)
+{
+	Node* p = head, *new_node;
+
+	if (index < 0 || index > length())
+		return;
+
+	if (index == 0)
+	{
+
+		new_node = new Node;
+		new_node->data = num;
+		if (head == NULL)
+		{
+			head = new_node;
+			head->next = head;
+		}
+		else
+		{
+
+			while (p->next != head)
+			{
+				p = p->next;
+			}
+			//new_node->next = p->next;
+			new_node->next = head;
+			p->next = new_node;
+			head = new_node;
+
+		}
+
+	}
+	else
+	{
+		for (int i = 0; i < index - 1; i++)
+		{
+			p = p->next;
+		}
+		new_node = new Node;
+		new_node->data = num;
+		new_node->next = p->next;
+		p->next = new_node;
+	}
+}
+
+int CircularLL::remove(int index)
+{
+	Node* p = head, * q;
+	int x;
+
+	if (index < 0 || index > length())
+		return -1;
+	else if (index == 0)
+	{
+		while (p->next != head)
+		{
+			p = p->next;
+		} 
+		x = head->data;
+		if (head == p)
+		{
+			delete head;
+			head = NULL;
+		}
+		else
+		{
+			p->next = head->next;
+			delete head;
+			head = p->next;
+		}
+
+	}
+	else
+	{
+		for (int i = 0; i < index - 2; i++)
+		{
+			p = p->next;
+		}
+		q = p->next;
+		p->next = q->next;
+		x = q->data;
+		q->next = NULL;
+		delete q;
+	}
+	return x;
 }
