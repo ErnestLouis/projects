@@ -16,7 +16,5 @@ class Arrqueue
 		void enqueue(int x);
 		void display();
 		int dequeue();
-
-
 };
 
