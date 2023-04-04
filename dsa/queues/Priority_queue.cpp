@@ -120,12 +120,32 @@ void Priority_queue::display()
 	std::cout << std::endl;
 }
 
-int Priority_queue::dequeue()
+char Priority_queue::dequeue()
 {
-	return -1;
+	char x = -1;
+	if (!(front == rear))
+	{
+		front++;
+		x = as_char(Q1[front]);
+	}
+	else if(!(front1 == rear1))
+	{
+		front1++;
+		x = as_char(Q1[front1]);
+	}
+	else if (!(front2 == rear2))
+	{
+		front1++;
+		x = as_char(Q1[front2]);
+	}
+	else
+	{
+		std::cout << "all queues are empty\n";
+	}
+	return x;
 }
 
-int num = 0;
+
 
 
 

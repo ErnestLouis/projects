@@ -18,6 +18,7 @@ enum class Element : char
 	F = 'F',
 }; 
 
+//This converts enum class element into actual type
 template <typename Element>
 auto as_char(Element const value)
 -> typename std::underlying_type<Element>::type
@@ -30,7 +31,6 @@ Element get_element();
 
 class Priority_queue
 {
-	friend std::istream& operator>>(std::istream& is, Element& e);
 
 	private:
 		int size;
@@ -47,13 +47,7 @@ class Priority_queue
 
 		void enqueue(Element ele, Priority level);
 		void display();
-		int dequeue();
+		char dequeue();
 };
 
 //Priority get_num(Priority num);
-
-inline std::istream& operator>>(std::istream& is, Element& e)
-{
-			is >> e;
-			return is;
-}

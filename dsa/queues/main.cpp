@@ -11,8 +11,16 @@ int main()
     q.enqueue(Element::A, Priority::HIGH);
     q.enqueue(Element::B, Priority::MEDIUM);
     q.enqueue(Element::C, Priority::LOW);
+    q.enqueue(Element::A, Priority::HIGH);
+    q.enqueue(Element::B, Priority::MEDIUM);
+    q.enqueue(Element::C, Priority::LOW);
+    q.enqueue(Element::A, Priority::HIGH);
+    q.enqueue(Element::B, Priority::MEDIUM);
+    q.enqueue(Element::C, Priority::LOW);
 
-    q.enqueue(get_element(), Priority::HIGH);
+    q.dequeue();
+
+    //q.enqueue(get_element(), Priority::HIGH);
 
     q.display();
 
